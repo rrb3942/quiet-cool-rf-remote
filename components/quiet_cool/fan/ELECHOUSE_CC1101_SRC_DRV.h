@@ -16,7 +16,15 @@ cc1101 Driver for RC Switch. Mod by Little Satan. With permission to modify and 
 #ifndef ELECHOUSE_CC1101_SRC_DRV_h
 #define ELECHOUSE_CC1101_SRC_DRV_h
 
+// The only edit to this vendored file: under the ESP-IDF framework there is no
+// Arduino.h, so pull in a shim providing the handful of Arduino symbols used
+// below. Everything else here is upstream, byte for byte.
+#include "esphome/core/defines.h"
+#ifdef USE_ARDUINO
 #include <Arduino.h>
+#else
+#include "arduino_compat.h"
+#endif
 
 //***************************************CC1101 define**************************************************//
 // CC1101 CONFIG REGSITER

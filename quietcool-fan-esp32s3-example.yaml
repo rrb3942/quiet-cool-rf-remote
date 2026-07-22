@@ -1,16 +1,18 @@
+# Seeed XIAO ESP32-S3 on the ESP-IDF framework.
+# The esp32dev / Arduino equivalent is quietcool-fan-example.yaml.
 esphome:
-  name: quietcool-junk
-  friendly_name: QuietCoolFan-junk
+  name: quietcool-s3-junk
+  friendly_name: QuietCoolFan-s3-junk
 
 esp32:
-  board: esp32dev
+  board: seeed_xiao_esp32s3
   framework:
-    type: arduino
+    type: esp-idf
 
-# Enable logging
 logger:
+  hardware_uart: USB_SERIAL_JTAG
+  level: DEBUG
 
-# Enable Home Assistant API
 api:
   encryption:
     key: !secret api_enctryption_key
@@ -23,7 +25,6 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Quietcool Fallback Hotspot"
     password: "iifozSf0C018"
@@ -36,15 +37,16 @@ external_components:
       path: components
     components: [quiet_cool]
 
-# The CC1101 driver does its own software SPI, so all six pins are configured
-# here -- there is no top-level `spi:` block.
+# XIAO ESP32-S3 pin mapping:
+#   GPIO7 = D8, GPIO8 = D9, GPIO9 = D10, GPIO1 = D0, GPIO2 = D1, GPIO4 = D3
 fan:
   - platform: quiet_cool
     name: QuietCool fan
-    clk_pin: 18
-    miso_pin: 19
-    mosi_pin: 23
-    cs_pin: 15
-    gdo0_pin: 13
-    gdo2_pin: 12
+    clk_pin: 7
+    miso_pin: 8
+    mosi_pin: 9
+    cs_pin: 1
+    gdo0_pin: 2
+    gdo2_pin: 4
     remote_id: [0x2D, 0xD4, 0x06, 0xCB, 0x00, 0xF7, 0xF2]
+    restore_mode: RESTORE_DEFAULT_OFF

@@ -49,6 +49,8 @@ class QuietCool {
     uint8_t remote_id[7];
     float   center_freq_mhz;
     float   deviation_khz;
+    uint8_t chip_version_{0};
+    bool    detected_{false};
 
     bool initCC1101();
     uint8_t readChipVersion();
@@ -63,6 +65,11 @@ class QuietCool {
     QuietCool(uint8_t csn, uint8_t gdo0, uint8_t gdo2, uint8_t sck, uint8_t miso, uint8_t mosi, const uint8_t* remote_id_in, float freq_mhz, float deviation_khz);
     void begin();
     void send(QuietCoolSpeed speed, QuietCoolDuration duration);
+    // Surfaced through dump_config() so the radio's status is visible on every API
+    // connect. setup() logs are only printed once at boot and are easily missed
+    // when connecting over the network rather than USB serial.
+    uint8_t chip_version() const { return chip_version_; }
+    bool detected() const { return detected_; }
 };
 
 }  // namespace quiet_cool

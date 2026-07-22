@@ -13,9 +13,14 @@
 cc1101 Driver for RC Switch. Mod by Little Satan. With permission to modify and publish Wilson Shen (ELECHOUSE).
 ----------------------------------------------------------------------------------------------------------------
 */
-#include <SPI.h>
+// The only edit to this vendored file: under the ESP-IDF framework there is no
+// Arduino.h or SPI.h, so the header below pulls in arduino_compat.h instead.
+// Everything past this point is upstream, byte for byte.
 #include "ELECHOUSE_CC1101_SRC_DRV.h"
+#ifdef USE_ARDUINO
+#include <SPI.h>
 #include <Arduino.h>
+#endif
 
 /****************************************************************/
 #define   WRITE_BURST       0x40            //write burst

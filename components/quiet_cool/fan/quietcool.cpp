@@ -145,6 +145,7 @@ bool QuietCool::initCC1101() {
     bool detected = false;
     while (tries--) {
         uint8_t version = readChipVersion();
+        this->chip_version_ = version;
         ESP_LOGI(TAG, "CC1101 VERSION READ: 0x%02X", version);
         if (version == 0x14 || version == 0x04) {
             ESP_LOGI(TAG, "CC1101 detected!");
@@ -152,6 +153,7 @@ bool QuietCool::initCC1101() {
             break;
         }
     }
+    this->detected_ = detected;
 
     if (!detected) {
         ESP_LOGE(TAG, "CC1101 not detected!");

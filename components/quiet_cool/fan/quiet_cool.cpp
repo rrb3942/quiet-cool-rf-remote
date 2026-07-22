@@ -14,8 +14,9 @@ namespace esphome {
             }
 
             if (this->qc_ == nullptr) {
-                // Use standard VSPI pins (CLK18, MISO19, MOSI23) for ESP32 dev boards
-                this->qc_.reset(new QuietCool(this->csn_pin_, this->gdo0_pin_, this->gdo2_pin_, 18, 19, 23, remote_id_.data(), center_freq_mhz, deviation_khz));
+                this->qc_.reset(new QuietCool(this->csn_pin_, this->gdo0_pin_, this->gdo2_pin_,
+                                              this->sck_pin_, this->miso_pin_, this->mosi_pin_,
+                                              remote_id_.data(), center_freq_mhz, deviation_khz));
             }
 
             this->qc_->begin();
@@ -63,6 +64,23 @@ namespace esphome {
             ESP_LOGVV(TAG, "write_state_: output calls completed");
         }
 
-        void QuietCoolFan::dump_config() { LOG_FAN("", "QuietCool fan", this); }
+        void QuietCoolFan::dump_config() {
+            LOG_FAN("", "QuietCool fan", this);
+            ESP_LOGCONFIG(TAG, "  Pins: clk=%u miso=%u mosi=%u cs=%u gdo0=%u gdo2=%u",
+                          this->sck_pin_, this->miso_pin_, this->mosi_pin_,
+                          this->csn_pin_, this->gdo0_pin_, this->gdo2_pin_);
+            ESP_LOGCONFIG(TAG, "  Center frequency: %.3f MHz, deviation: %.1f kHz",
+                          this->center_freq_mhz, this->deviation_khz);
+            if (this->qc_ == nullptr) {
+                ESP_LOGE(TAG, "  CC1101: not initialised");
+            } else if (this->qc_->detected()) {
+                ESP_LOGCONFIG(TAG, "  CC1101: detected (version 0x%02X)", this->qc_->chip_version());
+            } else {
+                // Reported here as well as at boot, because setup() output is printed
+                // once and is easy to miss when connecting over the network.
+                ESP_LOGE(TAG, "  CC1101: NOT DETECTED (last version read 0x%02X) -- check wiring, power and cs_pin",
+                         this->qc_->chip_version());
+            }
+        }
     }  // namespace quiet_cool
 }  // namespace esphome

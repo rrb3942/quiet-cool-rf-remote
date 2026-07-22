@@ -47,11 +47,6 @@ NOTE: the pinouts on these boards seem to be not reliable.  I had to trace them 
 * on your new entry, click `EDIT`
 * add the following to the bottom of the file:
 ```yaml
-spi:
-  clk_pin: 18
-  mosi_pin: 23
-  miso_pin: 19
-
 external_components:
   - source:
       type: git
@@ -62,6 +57,9 @@ external_components:
 fan:
   - platform: quiet_cool
     name: QuietCool fan
+    clk_pin: 18
+    miso_pin: 19
+    mosi_pin: 23
     cs_pin: 15
     gdo0_pin: 13
     gdo2_pin: 12
@@ -70,6 +68,10 @@ fan:
 #    center_freq_mhz: 433.897
 #    deviation_khz: 10
 ```
+
+Works on both the `arduino` and `esp-idf` frameworks. For a Seeed XIAO ESP32-S3 on
+`esp-idf`, use `clk_pin: 7`, `miso_pin: 8`, `mosi_pin: 9`, `cs_pin: 1`, `gdo0_pin: 2`,
+`gdo2_pin: 4` -- see `quietcool-fan-esp32s3-example.yaml`.
 * click `INSTALL` and install it in the normal ESPHome ways...
 
 ## TL;DR -- get it running on ESPHome, building locally
@@ -126,6 +128,9 @@ To find your remote ID, you can:
 fan:
   - platform: quiet_cool
     name: QuietCool fan
+    clk_pin: 18
+    miso_pin: 19
+    mosi_pin: 23
     cs_pin: 15
     gdo0_pin: 13
     gdo2_pin: 12
@@ -143,6 +148,9 @@ fan:
 |-------------------|----------|--------------|-----------|-----------------------------------------------------------------------------|
 | `name`            | Yes      | string       |           | The name of the fan in Home Assistant.                                      |
 | `platform`        | Yes      | string       |           | Must be `quiet_cool`.                                                       |
+| `clk_pin`         | Yes      | int          |           | SPI clock pin to CC1101.                                                    |
+| `miso_pin`        | Yes      | int          |           | SPI MISO pin from CC1101.                                                   |
+| `mosi_pin`        | Yes      | int          |           | SPI MOSI pin to CC1101.                                                     |
 | `cs_pin`          | Yes      | int          |           | SPI chip select pin for CC1101.                                             |
 | `gdo0_pin`        | Yes      | int          |           | GDO0 pin from CC1101 (used for TX status).                                  |
 | `gdo2_pin`        | Yes      | int          |           | GDO2 pin from CC1101 (can be -1 if unused).                                 |
@@ -150,14 +158,10 @@ fan:
 | `center_freq_mhz` | No       | float        | 433.897    | Center frequency in MHz for RF transmission.                                |
 | `deviation_khz`   | No       | float        | 10         | Frequency deviation (spread) in kHz for FSK modulation.                     |
 
-**Note:** You must also define the SPI bus pins in your YAML:
-
-```yaml
-spi:
-  clk_pin: 18
-  mosi_pin: 23
-  miso_pin: 19
-```
+**Note:** there is no top-level `spi:` block. The CC1101 driver bit-bangs SPI in software on
+the six pins above, which is what lets the same component run on both the `arduino` and
+`esp-idf` frameworks. If you are upgrading from an older version, delete your `spi:` block and
+move `clk_pin` / `miso_pin` / `mosi_pin` into the `fan:` block.
 
 ## Recent Improvements
 

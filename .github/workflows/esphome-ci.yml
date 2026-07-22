@@ -32,18 +32,25 @@ jobs:
         run: |
           pip install platformio
 
-      - name: Compile quietcool example
+      - name: Create dummy secrets
         run: |
-          # create a dummy secrets.yaml so esphome compile won’t error out
+          # so esphome compile won’t error out
           cat <<EOF > secrets.yaml
           wifi_ssid: dummy_ssid
           wifi_password: dummy_password
           api_enctryption_key: 1HUvrwkoGd889qBYWEjK7QtFbfIAE89r4p68rMxnc+U=
           ota_password: dummy_ota_password
           EOF
-          esphome compile quietcool-fan-example.yaml
 
-      - name: Compile quietcool example
+      - name: Compile quietcool example (esp32dev / arduino)
+        run: esphome compile quietcool-fan-example.yaml
+
+      # Exercises the arduino_compat.h shim: under esp-idf there is no Arduino.h,
+      # so the vendored CC1101 driver builds against the software-SPI shim instead.
+      - name: Compile quietcool example (xiao esp32s3 / esp-idf)
+        run: esphome compile quietcool-fan-esp32s3-example.yaml
+
+      - name: Compile arduino sketch
         run: |
           cd arduino
           pio run
